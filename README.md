@@ -1,4 +1,4 @@
-````sh
+```sh
 # install rust
 # https://www.rust-lang.org/tools/install
 
@@ -115,4 +115,7 @@ chmod +x ./lue_vm
 - [ ] Error handling
   - [ ] Exception handling
   - [ ] Error messages
-````
+
+```
+
+```
