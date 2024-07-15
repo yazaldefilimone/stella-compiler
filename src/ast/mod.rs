@@ -1,5 +1,5 @@
 mod ast;
-mod token;
+pub mod token;
 
-pub use ast::*;
+// pub use ast::*;
 pub use token::*;
