@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ ! -f ./target/release/lua_vm ]]; then
+  echo "Error: not found a bin file named 'lua_vm' in the 'target/release' directory"
+  echo "Please run 'cargo build --release' first."
+  exit 1
+fi
+
+./target/release/lua_vm "$@"
