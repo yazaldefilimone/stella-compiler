@@ -5,6 +5,8 @@
 # build the binary
 cargo build --release
 
+chmod +x ./lue_vm
+
 # run a lua file
 ./lue_vm features/stdlib/print.lua
 
