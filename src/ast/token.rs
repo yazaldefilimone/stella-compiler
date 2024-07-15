@@ -1,17 +1,10 @@
-use crate::utils::Location;
+#![allow(dead_code)]
+use crate::vm::ExeState;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum TokenKind {
-  Identifier,
-  Syntax,
-  Keyword,
-  Number,
-  Operator,
-}
-
-#[derive(Debug, Clone)]
-pub struct Token {
-  pub value: String,
-  pub kind: TokenKind,
-  pub loc: Location,
+#[derive(Debug)]
+pub enum Token {
+  Name(String),
+  String(String),
+  Function(fn(&mut ExeState) -> i32),
+  Eof,
 }
