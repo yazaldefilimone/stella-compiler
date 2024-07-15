@@ -1,3 +1,15 @@
+````sh
+# install rust
+# https://www.rust-lang.org/tools/install
+
+# build the binary
+cargo build --release
+
+# run a lua file
+./lue_vm features/stdlib/print.lua
+
+```
+
 ### TODO
 
 - [ ] Arithmetic expressions
@@ -45,14 +57,11 @@
   - [ ] Assignment
   - [ ] Access global variables
 - [ ] tables
-
   - [ ] Table declaration
   - [ ] Access table elements
   - [ ] Insert and remove table elements
   - [ ] Metatables and metamethods
-
 - [ ] Standard Library (Stdlib)
-
   - [ ] Base functions
     - [ ] `print`
     - [ ] `type`
@@ -82,19 +91,15 @@
     - [ ] `table.concat`
     - [ ] `table.sort`
     - [ ] `table.unpack`
-
 - [ ] Coroutines
-
   - [ ] `coroutine.create`
   - [ ] `coroutine.resume`
   - [ ] `coroutine.yield`
   - [ ] `coroutine.status`
-
 - [ ] Metatables
   - [ ] `setmetatable`
   - [ ] `getmetatable`
 - [ ] Metamethods
-
   - [ ] `__index`
   - [ ] `__newindex`
   - [ ] `__add`
@@ -105,7 +110,7 @@
   - [ ] `__eq`
   - [ ] `__lt`
   - [ ] `__le`
-
 - [ ] Error handling
   - [ ] Exception handling
   - [ ] Error messages
+````
