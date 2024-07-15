@@ -1,77 +1,55 @@
-use crate::{ast, utils::syntax::expect_syntax};
+use crate::{ast::Token, bytecode::ByteCode, lexer::Lexer, values::Value};
 
-fn parse_statement(raw: &[char], tokens: &[ast::Token], index: usize) -> Option<(ast::Statement, usize)> {
-  let parsers = [
-    parse_if,
-    parse_expression_statement,
-    parse_return,
-    parse_function,
-    parse_local,
-  ];
-  for parser in parsers {
-    let res = parser(raw, tokens, index);
-    if res.is_some() {
-      return res;
+#[derive(Debug)]
+pub struct Book {
+  pub constants: Vec<Value>,
+  pub byte_codes: Vec<ByteCode>,
+}
+
+#[derive(Debug)]
+pub struct Parser {
+  lex: Lexer,
+}
+
+impl Parser {
+  pub fn new(raw: String) -> Self {
+    let lex = Lexer::new(raw);
+    Parser { lex }
+  }
+
+  pub fn parse_book(&mut self) -> Book {
+    let mut constants = vec![];
+    let mut byte_codes = vec![];
+    loop {
+      let token = self.lex.next_token();
+      match token {
+        Token::Name(name) => {
+          constants.push(Value::String(name));
+          let constant_index: u8 = (constants.len() - 1) as u8;
+          byte_codes.push(ByteCode::GetGlobal(0, constant_index));
+          // todo: remove this, it's just for testing purpose
+          if let Token::String(string) = self.lex.next_token() {
+            constants.push(Value::String(string));
+            let constant_index: u8 = (constants.len() - 1) as u8;
+            byte_codes.push(ByteCode::LoadConstant(1, constant_index));
+
+            byte_codes.push(ByteCode::Call(0, 1));
+          } else {
+            panic!("Expected string after function name.");
+          }
+        }
+        Token::String(string) => {
+          constants.push(Value::String(string));
+          let constant_index: u8 = (constants.len() - 1) as u8;
+          byte_codes.push(ByteCode::GetGlobal(0, constant_index));
+        }
+        Token::Eof => break,
+
+        _token => panic!("Unexpected token : {:?}", _token),
+      }
     }
+    // dbg!(&constants);
+    // dbg!(&byte_codes);
+    Book { constants, byte_codes }
   }
-
-  None
-}
-
-pub fn parse(raw: &[char], tokens: Vec<ast::Token>) -> Result<ast::Program, String> {
-  let mut ast = vec![];
-  let mut index = 0;
-  let ntokens = tokens.len();
-  while index < ntokens {
-    let res = parse_statement(raw, &tokens, index);
-    if let Some((stmt, next_index)) = res {
-      index = next_index;
-      ast.push(stmt);
-      continue;
-    }
-
-    return Err(tokens[index].loc.debug(raw, "Invalid token while parsing:"));
-  }
-
-  Ok(ast)
-}
-
-fn parse_expression_statement(raw: &[char], tokens: &[ast::Token], index: usize) -> Option<(ast::Statement, usize)> {
-  let mut next_index = index;
-  let res = parse_expression(raw, tokens, next_index)?;
-
-  let (expr, next_next_index) = res;
-  next_index = next_next_index;
-  if !expect_syntax(tokens, next_index, ";") {
-    let error = tokens[next_index]
-      .loc
-      .debug(raw, "Expected semicolon after expression:");
-
-    println!("{:?}", error);
-    return None;
-  }
-
-  next_index += 1; // Skip past semicolon
-
-  Some((Statement::Expression(expr), next_index))
-}
-
-fn parse_expression(raw: &[char], tokens: &[ast::Token], index: usize) -> Option<(ast::Expression, usize)> {
-  let mut next_index = index;
-  let res = parse_assignment(raw, tokens, next_index)?;
-
-  let (expr, next_next_index) = res;
-  next_index = next_next_index;
-
-  Some((expr, next_index))
-}
-
-fn parse_assignment(raw: &[char], tokens: &[ast::Token], index: usize) -> Option<(ast::Expression, usize)> {
-  let mut next_index = index;
-  let res = parse_if(raw, tokens, next_index)?;
-
-  let (expr, next_next_index) = res;
-  next_index = next_next_index;
-
-  Some((expr, next_index))
 }
