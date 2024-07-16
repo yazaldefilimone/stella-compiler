@@ -65,7 +65,7 @@ chmod +x ./lue_vm
   - [ ] Metatables and metamethods
 - [ ] Standard Library (Stdlib)
   - [ ] Base functions
-    - [ ] `print`
+    - [x] `print`
     - [ ] `type`
     - [ ] `tostring`
     - [ ] `tonumber`
