@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 
 use crate::bytecode::ByteCode;
-use crate::parser::Book;
+use crate::compiler::Book;
 use crate::stdlib::base::lib_print;
 use crate::{stack::Stack, values::Value};
 
