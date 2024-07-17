@@ -1,6 +1,8 @@
 #![allow(dead_code, unused_imports)]
 
-use crate::ast::Token;
+use crate::utils::is_digit;
+
+use super::token::Token;
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -16,32 +18,99 @@ impl Lexer {
   pub fn next_token(&mut self) -> Token {
     self.skip_whitespace();
     if self.is_end() {
-      return Token::Eof;
+      return Token::EOF;
     }
 
     let current_character = self.peek_one();
     match current_character {
-      'a'..='z' | 'A'..='Z' | '_' => self.lex_name(),
-      '"' => self.lex_string(),
-      // '0'..='9' => self.lex_number(),
+      'a'..='z' | 'A'..='Z' | '_' => self.lex_identifier(),
+      '"' => self.lex_string_literal(),
+      '0'..='9' => self.lex_number_literal(),
+      '(' => Token::LPAREN,
+      ')' => Token::RPAREN,
+      '{' => Token::LBRACE,
+      '}' => Token::RBRACE,
+      '[' => Token::LSQUARE,
+      ']' => Token::RSQUARE,
+      ':' => Token::COLON,
+      ';' => Token::SEMICOLON,
+      ',' => Token::COMMA,
+      '.' => Token::DOT,
+      '+' => Token::ADD,
+      '-' => Token::SUB,
+      '*' => Token::MUL,
+      '/' => Token::DIV,
+      '%' => Token::MOD,
+      '^' => Token::POW,
+      '#' => Token::LEN,
+      '&' => Token::BITAND,
+      '~' => Token::BITXOR,
+      '|' => Token::BITOR,
       _ => panic!("Unexpected charcter '{}'", current_character),
     }
   }
 
-  fn lex_string(&mut self) -> Token {
+  fn lex_string_literal(&mut self) -> Token {
     self.consume_expect("\"");
     let text = self.consume_while(|character| character != '"');
     self.consume_expect("\"");
     Token::String(text)
   }
 
-  // fn lex_number(&self) -> Token {
-  //   let text = self.consume_while(|c| c.is_ascii_digit());
-  //   Token::Number(text)
-  // }
-  pub fn lex_name(&mut self) -> Token {
+  fn lex_number_literal(&mut self) -> Token {
+    let text = self.consume_while(|character| is_digit(character));
+    // todo: you can do better yazalde filimone :)
+    match text.parse::<i64>() {
+      Ok(integer) => Token::Integer(integer),
+      Err(_) => Token::Float(text.parse::<f64>().unwrap()),
+    }
+  }
+
+  fn lex_identifier(&mut self) -> Token {
     let text = self.consume_while(|c| c.is_ascii_alphanumeric());
-    Token::Name(text)
+    let token = self.consume_keyword_or_identifier(&text);
+    return token;
+  }
+
+  fn consume_keyword_or_identifier(&mut self, text: &str) -> Token {
+    match text {
+      "and" => Token::AND,
+      "break" => Token::BREAK,
+      "do" => Token::DO,
+      "else" => Token::ELSE,
+      "elseif" => Token::ELSIF,
+      "end" => Token::END,
+      "false" => Token::FALSE,
+      "for" => Token::FOR,
+      "goto" => Token::GOTO,
+      "if" => Token::IF,
+      "in" => Token::IN,
+      "local" => Token::LOCAL,
+      "nil" => Token::NIL,
+      "not" => Token::NOT,
+      "or" => Token::OR,
+      "repeat" => Token::REPEAT,
+      "return" => Token::RETURN,
+      "then" => Token::THEN,
+      "true" => Token::TRUE,
+      "until" => Token::UNTIL,
+      "while" => Token::WHILE,
+      "function" => Token::FUNCTION,
+      _ => Token::Identifier(text.to_string()),
+    }
+  }
+  // comment's
+  fn lex_comment(&mut self) -> Token {
+    self.consume_expect("--");
+    let text = self.consume_while(|c| c != '\n');
+    Token::Comment(text)
+  }
+
+  pub fn lex_block_comment(&mut self) -> Token {
+    self.consume_expect("--[");
+    let text = self.consume_while(|c| c != ']');
+    self.consume_expect("]--");
+    Token::BlockComment(text)
   }
 
   fn skip_whitespace(&mut self) {
