@@ -1,18 +1,17 @@
-use parser::Parser;
+use compiler::Compiler;
 use vm::ExeState;
 
-mod ast;
 mod bytecode;
+mod cli;
+mod compiler;
+mod diagnostics;
 mod format;
 mod lexer;
-mod parser;
 mod stack;
 mod stdlib;
 mod utils;
 mod values;
 mod vm;
-
-mod cli;
 
 fn main() {
   let matches = cli::command_line();
@@ -32,8 +31,8 @@ fn main() {
 
 fn run_lua(file: &str) {
   let raw = std::fs::read_to_string(file).unwrap();
-  let mut parser = Parser::new(raw);
-  let book = parser.parse_book();
+  let mut compiler = Compiler::new(raw);
+  let book = compiler.compile_book();
   let mut exe_state = ExeState::new();
   exe_state.execute(&book);
 }
