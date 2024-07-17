@@ -8,7 +8,8 @@ use crate::vm::ExeState;
 pub enum Value {
   Nil,
   Boolean(bool),
-  Number(f64),
+  Integer(i64),
+  Float(f64),
   String(String),
   Function(fn(&mut ExeState) -> i32),
   // Table(Table),
