@@ -21,3 +21,15 @@ pub fn debug(raw: &[char], message: &str) -> String {
     raw.iter().take(i).collect::<String>()
   )
 }
+
+pub fn is_digit(character: char) -> bool {
+  return "0123456789".contains(character);
+}
+
+pub fn normalize_float_number(number: f64) -> String {
+  if number.fract() == 0.0 {
+    let integer = format!("{}", number);
+    return integer.trim_end_matches(".0").to_string();
+  }
+  return format!("{}", number);
+}
