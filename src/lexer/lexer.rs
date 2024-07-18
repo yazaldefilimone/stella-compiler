@@ -8,14 +8,33 @@ use super::token::Token;
 pub struct Lexer {
   raw: String,
   cursor: usize,
+  peeked_token: Option<Token>,
+  peeked: bool,
 }
 
 impl Lexer {
   pub fn new(raw: String) -> Self {
-    Lexer { raw, cursor: 0 }
+    Lexer { raw, cursor: 0, peeked_token: None, peeked: false }
+  }
+
+  pub fn peek_token(&mut self) -> Token {
+    let next_token = self.read_next_token();
+    self.peeked = true;
+    self.peeked_token = Some(next_token.clone());
+    return next_token;
   }
 
   pub fn next_token(&mut self) -> Token {
+    if self.peeked_token.is_some() && self.peeked {
+      self.peeked = false;
+      return self.peeked_token.clone().unwrap();
+    }
+    self.peeked = false;
+    self.peeked_token = None;
+    return self.read_next_token();
+  }
+
+  fn read_next_token(&mut self) -> Token {
     self.skip_whitespace();
     if self.is_end() {
       return Token::EOF;
@@ -390,5 +409,31 @@ mod tests {
     //end of file
     let token = lexer.next_token();
     assert_eq!(token, Token::EOF);
+  }
+
+  // test peek token
+  #[test]
+  fn test_lexer_peek_token() {
+    let raw = r#"
+      print(a >= 1);
+      "#;
+
+    let mut lexer = Lexer::new(raw.to_string());
+    let token = lexer.next_token();
+    assert_eq!(token, Token::Identifier("print".to_string()));
+    let token = lexer.peek_token();
+    assert_eq!(token, Token::LPAREN);
+    let token = lexer.next_token();
+    assert_eq!(token, Token::LPAREN);
+    let token = lexer.next_token();
+    assert_eq!(token, Token::Identifier("a".to_string()));
+    let token = lexer.next_token();
+    assert_eq!(token, Token::GREATEREQ);
+    let token = lexer.next_token();
+    assert_eq!(token, Token::Integer(1));
+    let token = lexer.next_token();
+    assert_eq!(token, Token::RPAREN);
+    let token = lexer.next_token();
+    assert_eq!(token, Token::SEMICOLON);
   }
 }

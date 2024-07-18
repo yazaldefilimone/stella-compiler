@@ -1,5 +1,5 @@
 use compiler::Compiler;
-use vm::ExeState;
+use vm::VirtualMachine;
 
 mod bytecode;
 mod cli;
@@ -33,8 +33,8 @@ fn run_lua(file: &str) {
   let raw = std::fs::read_to_string(file).unwrap();
   let mut compiler = Compiler::new(raw);
   let book = compiler.compile_book();
-  let mut exe_state = ExeState::new();
-  exe_state.execute(&book);
+  let mut vm = VirtualMachine::new();
+  vm.execute(&book);
 }
 
 fn compile_lua(file: &str) {

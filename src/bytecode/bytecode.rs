@@ -1,6 +1,7 @@
-#[derive(Debug)]
+#![allow(dead_code)]
+#[derive(Clone)]
 pub enum ByteCode {
-  LoadConstant(u8, u8),
+  LoadConst(u8, u8),
   GetGlobal(u8, u8),
   Call(u8, u8),
   LoadBoolean(u8, bool),
