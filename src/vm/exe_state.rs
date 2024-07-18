@@ -55,6 +55,7 @@ impl ExeState {
           panic!("invalid function: {:?}", calleble_value);
         }
       }
+      _ => panic!("invalid byte code: {:?}", byte_code),
     };
   }
 }

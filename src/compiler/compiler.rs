@@ -45,17 +45,15 @@ impl Compiler {
           let constant_index: u8 = (constants.len() - 1) as u8;
           byte_codes.push(ByteCode::GetGlobal(0, constant_index));
         }
-        Token::LPAREN => {
-          match self.lex.next_token() {
-            Token::RPAREN => {
-              let byte_code = self.compile_call_expression(&mut constants);
-              byte_codes.push(byte_code);
-            }
-            _ => {
-              panic!("Expected ')' after '('");
-            }
+        Token::LPAREN => match self.lex.next_token() {
+          Token::RPAREN => {
+            let byte_code = self.compile_call_expression(&mut constants);
+            byte_codes.push(byte_code);
           }
-        }
+          _ => {
+            panic!("Expected ')' after '('");
+          }
+        },
         Token::EOF => break,
         _token => panic!("Unexpected token : {:?}", _token),
       }
@@ -74,22 +72,22 @@ impl Compiler {
       Token::NIL => ByteCode::LoadNil(1),
       Token::TRUE => ByteCode::LoadBoolean(1, true),
       Token::FALSE => ByteCode::LoadBoolean(1, false),
-      Token::Integer(integer) =>  {
+      Token::Integer(integer) => {
         if let Ok(integer) = i64::try_from(integer) {
           return ByteCode::LoadInteger(1, integer);
         }
         return load_constant(constants, 1, Value::Integer(integer));
-      },
+      }
       Token::Float(float) => {
         return load_constant(constants, 1, Value::Float(float));
-      },
+      }
       Token::String(string) => {
         return load_constant(constants, 1, Value::String(string));
-      },
-      _ => {
-        panic!("Unexpected token : {:?}", expression),
       }
-    }
+      _ => {
+        panic!("Unexpected token : {:?}", expression);
+      }
+    };
     return ByteCode::Nop;
   }
 }
