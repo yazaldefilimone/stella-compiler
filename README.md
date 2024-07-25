@@ -12,6 +12,10 @@ chmod +x ./lue_vm
 
 ```
 
+
+- Type System: [Stella checker](https://github.com/yazaldefilimone/stella-compiler)
+
+<!--
 ### TODO
 
 - [ ] Arithmetic expressions
