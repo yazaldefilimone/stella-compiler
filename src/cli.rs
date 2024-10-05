@@ -1,12 +1,7 @@
-// Copyright 2024 Yazalde Filimone <yazalde.filimone@gmail.com>
-//
-// Virtual Machine Command Line Interface
-//
-
 use clap::{Arg, Command};
 
 pub fn command_line() -> clap::ArgMatches {
-  let matches = Command::new("Lua")
+  let matches = Command::new("Stella Compiller")
     .about("Rust-based, speedy, lightweight lua virtual machine.")
     .subcommand_required(true)
     .arg_required_else_help(true)
